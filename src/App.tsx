@@ -240,26 +240,33 @@ const HousekeepingView = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const q = query(collection(db, 'rooms'), orderBy('number', 'asc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const roomsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Room));
-      setRooms(roomsData);
+  const fetchRooms = async () => {
+    try {
+      const response = await fetch('/api/rooms');
+      const data = await response.json();
+      setRooms(data);
+    } catch (error) {
+      console.error("Error fetching rooms:", error);
+    } finally {
       setLoading(false);
-    }, (error) => {
-      handleFirestoreError(error, OperationType.LIST, 'rooms');
-    });
+    }
+  };
 
-    return () => unsubscribe();
+  useEffect(() => {
+    fetchRooms();
   }, []);
 
   const handleStatusChange = async (roomId: string, newStatus: string) => {
     try {
-      const roomRef = doc(db, 'rooms', roomId);
-      await updateDoc(roomRef, { status: newStatus });
+      await fetch(`/api/rooms/${roomId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
       toast.success(`Room status updated to ${newStatus}`);
+      fetchRooms();
     } catch (error) {
-      handleFirestoreError(error, OperationType.UPDATE, `rooms/${roomId}`);
+      console.error("Error updating room:", error);
     }
   };
 
@@ -331,23 +338,21 @@ const ReservationsView = ({ role }: { role: string }) => {
   const [loading, setLoading] = useState(true);
   const isStaff = ['admin', 'staff'].includes(role);
 
-  useEffect(() => {
-    let q;
-    if (isStaff) {
-      q = query(collection(db, 'reservations'), orderBy('createdAt', 'desc'));
-    } else {
-      q = query(collection(db, 'reservations'), where('guestId', '==', auth.currentUser?.uid), orderBy('createdAt', 'desc'));
-    }
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const resData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Reservation));
-      setReservations(resData);
+  const fetchReservations = async () => {
+    try {
+      const url = isStaff ? '/api/reservations' : `/api/reservations?guestId=${auth.currentUser?.uid}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      setReservations(data);
+    } catch (error) {
+      console.error("Error fetching reservations:", error);
+    } finally {
       setLoading(false);
-    }, (error) => {
-      handleFirestoreError(error, OperationType.LIST, 'reservations');
-    });
+    }
+  };
 
-    return () => unsubscribe();
+  useEffect(() => {
+    fetchReservations();
   }, [isStaff]);
 
   const getStatusBadge = (status: string) => {
@@ -435,26 +440,33 @@ const UsersView = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const q = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const usersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setUsers(usersData);
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch('/api/users');
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
       setLoading(false);
-    }, (error) => {
-      handleFirestoreError(error, OperationType.LIST, 'users');
-    });
+    }
+  };
 
-    return () => unsubscribe();
+  useEffect(() => {
+    fetchUsers();
   }, []);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     try {
-      const userRef = doc(db, 'users', userId);
-      await updateDoc(userRef, { role: newRole });
+      await fetch(`/api/users/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: newRole }),
+      });
       toast.success(`Role updated to ${newRole}`);
+      fetchUsers();
     } catch (error) {
-      handleFirestoreError(error, OperationType.UPDATE, `users/${userId}`);
+      console.error("Error updating user:", error);
     }
   };
 
@@ -1403,19 +1415,21 @@ export default function App() {
           displayName: fullName
         });
 
-        // Save Additional Info to Firestore
-        const userRef = doc(db, 'users', userCredential.user.uid);
-        await setDoc(userRef, {
-          uid: userCredential.user.uid,
-          email: userCredential.user.email,
-          displayName: fullName,
-          phoneNumber,
-          dateOfBirth,
-          nationality,
-          idType,
-          idNumber,
-          role: 'guest', // Default role for external sign-ups
-          createdAt: new Date().toISOString()
+        // Save Additional Info to SQL Database
+        await fetch('/api/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            uid: userCredential.user.uid,
+            email: userCredential.user.email,
+            displayName: fullName,
+            phoneNumber,
+            dateOfBirth,
+            nationality,
+            idType,
+            idNumber,
+            role: 'guest'
+          })
         });
 
         toast.success("Account created successfully!");
@@ -1736,17 +1750,20 @@ const RoomsView = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const q = query(collection(db, 'rooms'), orderBy('number', 'asc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const roomsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Room));
-      setRooms(roomsData);
+  const fetchRooms = async () => {
+    try {
+      const response = await fetch('/api/rooms');
+      const data = await response.json();
+      setRooms(data);
+    } catch (error) {
+      console.error("Error fetching rooms:", error);
+    } finally {
       setLoading(false);
-    }, (error) => {
-      handleFirestoreError(error, OperationType.LIST, 'rooms');
-    });
+    }
+  };
 
-    return () => unsubscribe();
+  useEffect(() => {
+    fetchRooms();
   }, []);
 
   const getStatusBadge = (status: string) => {

@@ -41,17 +41,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     if (user) {
-      const unsubscribeProfile = onSnapshot(doc(db, 'users', user.uid), (doc) => {
-        if (doc.exists()) {
-          setProfile(doc.data() as UserProfile);
+      const fetchProfile = async () => {
+        try {
+          const response = await fetch(`/api/users`);
+          const users = await response.json();
+          const userProfile = users.find((u: any) => u.uid === user.uid);
+          if (userProfile) {
+            setProfile(userProfile);
+          }
+        } catch (error) {
+          console.error("Error fetching user profile:", error);
+        } finally {
+          setLoading(false);
         }
-        setLoading(false);
-      }, (error) => {
-        console.error("Error fetching user profile:", error);
-        setLoading(false);
-      });
+      };
 
-      return () => unsubscribeProfile();
+      fetchProfile();
+      // Since we don't have real-time SQL sync easily without WebSockets, 
+      // we'll just fetch once on login.
     }
   }, [user]);
 
