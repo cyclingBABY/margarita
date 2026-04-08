@@ -1,0 +1,115 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // Collection: users
+    // Document ID: {userId}
+    // Fields: uid, email, displayName, role, photoURL, phoneNumber, dateOfBirth, nationality, idType, idNumber, createdAt
+    //
+    // Collection: rooms
+    // Document ID: {roomId}
+    // Fields: number, type, status, pricePerNight, description, floor
+    //
+    // Collection: reservations
+    // Document ID: {reservationId}
+    // Fields: guestId, guestName, roomId, roomNumber, checkInDate, checkOutDate, totalAmount, status, paymentStatus, createdAt
+    //
+    // Collection: messages
+    // Document ID: {messageId}
+    // Fields: senderId, receiverId, content, timestamp, read
+    //
+    // Collection: feedback
+    // Document ID: {feedbackId}
+    // Fields: guestId, guestName, rating, comment, createdAt
+    //
+    // Collection: events
+    // Document ID: {eventId}
+    // Fields: title, description, organizerId, organizerName, date, location, status
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         (request.auth.token.email == "stuartdonsms@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isStaff() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'staff', 'housekeeping'];
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function isValidUser(data) {
+      return data.uid is string && data.uid == request.auth.uid &&
+             data.email is string && data.role in ['admin', 'staff', 'housekeeping', 'guest'] &&
+             (!('phoneNumber' in data) || data.phoneNumber is string) &&
+             (!('dateOfBirth' in data) || data.dateOfBirth is string) &&
+             (!('nationality' in data) || data.nationality is string) &&
+             (!('idType' in data) || data.idType in ['Passport', 'National ID', 'Driver\'s License']) &&
+             (!('idNumber' in data) || data.idNumber is string);
+    }
+
+    function isValidFeedback(data) {
+      return data.guestId is string && data.rating is number && data.rating >= 1 && data.rating <= 5;
+    }
+
+    function isValidEvent(data) {
+      return data.title is string && data.title.size() > 0 && data.status in ['pending', 'confirmed', 'cancelled'];
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isAdmin() || (isOwner(userId) && request.resource.data.role == resource.data.role);
+    }
+
+    match /rooms/{roomId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    match /reservations/{reservationId} {
+      allow read: if isAuthenticated() && (isOwner(resource.data.guestId) || isStaff());
+      allow create: if isAuthenticated() && (isOwner(request.resource.data.guestId) || isStaff());
+      allow update: if isAuthenticated() && (isOwner(resource.data.guestId) || isStaff());
+      allow delete: if isAdmin();
+    }
+
+    match /messages/{messageId} {
+      allow read: if isAuthenticated() && (isOwner(resource.data.senderId) || isOwner(resource.data.receiverId) || isStaff());
+      allow create: if isAuthenticated() && isOwner(request.resource.data.senderId);
+    }
+
+    match /feedback/{feedbackId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isOwner(request.resource.data.guestId) && isValidFeedback(request.resource.data);
+      allow update, delete: if isAdmin();
+    }
+
+    match /events/{eventId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isValidEvent(request.resource.data);
+      allow update: if isStaff() || isOwner(resource.data.organizerId);
+      allow delete: if isAdmin();
+    }
+  }
+}

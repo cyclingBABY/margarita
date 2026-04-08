@@ -1,0 +1,122 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Stores user information and roles",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "staff", "housekeeping", "guest"] },
+        "photoURL": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "dateOfBirth": { "type": "string", "format": "date" },
+        "nationality": { "type": "string" },
+        "idType": { "type": "string", "enum": ["Passport", "National ID", "Driver's License"] },
+        "idNumber": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role", "createdAt"]
+    },
+    "Room": {
+      "title": "Room",
+      "description": "Hotel room details and status",
+      "type": "object",
+      "properties": {
+        "number": { "type": "string" },
+        "type": { "type": "string", "enum": ["single", "double", "suite", "deluxe"] },
+        "status": { "type": "string", "enum": ["available", "occupied", "dirty", "maintenance"] },
+        "pricePerNight": { "type": "number" },
+        "description": { "type": "string" },
+        "floor": { "type": "number" }
+      },
+      "required": ["number", "type", "status", "pricePerNight"]
+    },
+    "Reservation": {
+      "title": "Reservation",
+      "description": "Booking details",
+      "type": "object",
+      "properties": {
+        "guestId": { "type": "string" },
+        "guestName": { "type": "string" },
+        "roomId": { "type": "string" },
+        "roomNumber": { "type": "string" },
+        "checkInDate": { "type": "string", "format": "date-time" },
+        "checkOutDate": { "type": "string", "format": "date-time" },
+        "totalAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "checked-in", "checked-out", "cancelled"] },
+        "paymentStatus": { "type": "string", "enum": ["pending", "paid", "failed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["guestId", "roomId", "checkInDate", "checkOutDate", "status"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Communication between guests and staff",
+      "type": "object",
+      "properties": {
+        "senderId": { "type": "string" },
+        "receiverId": { "type": "string" },
+        "content": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "read": { "type": "boolean" }
+      },
+      "required": ["senderId", "receiverId", "content", "timestamp"]
+    },
+    "Feedback": {
+      "title": "Feedback",
+      "description": "Guest reviews and ratings",
+      "type": "object",
+      "properties": {
+        "guestId": { "type": "string" },
+        "guestName": { "type": "string" },
+        "rating": { "type": "number" },
+        "comment": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["guestId", "rating", "createdAt"]
+    },
+    "Event": {
+      "title": "Event",
+      "description": "Conference and event bookings",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "organizerId": { "type": "string" },
+        "organizerName": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "location": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled"] }
+      },
+      "required": ["title", "date", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profiles"
+    },
+    "/rooms/{roomId}": {
+      "schema": "Room",
+      "description": "Hotel rooms"
+    },
+    "/reservations/{reservationId}": {
+      "schema": "Reservation",
+      "description": "Booking records"
+    },
+    "/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Chat messages"
+    },
+    "/feedback/{feedbackId}": {
+      "schema": "Feedback",
+      "description": "Guest feedback"
+    },
+    "/events/{eventId}": {
+      "schema": "Event",
+      "description": "Event bookings"
+    }
+  }
+}
