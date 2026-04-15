@@ -37,9 +37,12 @@ import {
   Link,
   CreditCard,
   MapPin,
-  Check
+  Check,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import Autoplay from "embla-carousel-autoplay";
 import { auth, db, handleFirestoreError, OperationType } from './firebase';
 import { 
   signInWithPopup, 
@@ -831,10 +834,11 @@ const ContactView = () => (
 );
 
 const GuestLandingView = ({ activePage, setActivePage, onReturnToAdmin }: { activePage: string, setActivePage: (p: string) => void, onReturnToAdmin?: () => void }) => {
+  const autoplayPlugin = React.useRef(Autoplay({ delay: 3000, stopOnInteraction: true }));
   const renderPage = () => {
     switch (activePage) {
       case 'home': return (
-        <div className="space-y-0 -m-8">
+        <div className="space-y-0 -m-4 md:-m-8">
           {onReturnToAdmin && (
             <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[60]">
               <Button 
@@ -881,17 +885,17 @@ const GuestLandingView = ({ activePage, setActivePage, onReturnToAdmin }: { acti
                 className="bg-white/95 backdrop-blur-md p-2 rounded-none shadow-2xl flex flex-col md:flex-row items-center gap-2 max-w-5xl mx-auto"
               >
                 <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2 w-full">
-                  <div className="flex flex-col items-start px-6 py-3 border-r border-hotel-blue/5">
+                  <div className="flex flex-col items-center md:items-start px-6 py-3 border-b md:border-b-0 md:border-r border-hotel-blue/5 text-center md:text-left w-full">
                     <label className="text-[10px] uppercase font-bold text-hotel-gold tracking-widest mb-1">Check In</label>
-                    <input type="date" className="bg-transparent border-none text-hotel-blue font-medium focus:ring-0 w-full" defaultValue={format(new Date(), 'yyyy-MM-dd')} />
+                    <input type="date" className="bg-transparent border-none text-hotel-blue font-medium focus:ring-0 w-full text-center md:text-left" defaultValue={format(new Date(), 'yyyy-MM-dd')} />
                   </div>
-                  <div className="flex flex-col items-start px-6 py-3 border-r border-hotel-blue/5">
+                  <div className="flex flex-col items-center md:items-start px-6 py-3 border-b md:border-b-0 md:border-r border-hotel-blue/5 text-center md:text-left w-full">
                     <label className="text-[10px] uppercase font-bold text-hotel-gold tracking-widest mb-1">Check Out</label>
-                    <input type="date" className="bg-transparent border-none text-hotel-blue font-medium focus:ring-0 w-full" defaultValue={format(new Date(Date.now() + 86400000), 'yyyy-MM-dd')} />
+                    <input type="date" className="bg-transparent border-none text-hotel-blue font-medium focus:ring-0 w-full text-center md:text-left" defaultValue={format(new Date(Date.now() + 86400000), 'yyyy-MM-dd')} />
                   </div>
-                  <div className="flex flex-col items-start px-6 py-3">
+                  <div className="flex flex-col items-center md:items-start px-6 py-3 text-center md:text-left w-full">
                     <label className="text-[10px] uppercase font-bold text-hotel-gold tracking-widest mb-1">Guests</label>
-                    <select className="bg-transparent border-none text-hotel-blue font-medium focus:ring-0 w-full">
+                    <select className="bg-transparent border-none text-hotel-blue font-medium focus:ring-0 w-full text-center md:text-left text-center-last md:text-left-last">
                       <option>2 Adults, 0 Children</option>
                       <option>1 Adult, 0 Children</option>
                       <option>2 Adults, 1 Child</option>
@@ -914,29 +918,50 @@ const GuestLandingView = ({ activePage, setActivePage, onReturnToAdmin }: { acti
                 <div className="w-20 h-1 bg-hotel-gold mx-auto"></div>
               </div>
               
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
-                {[
-                  { icon: Wifi, label: 'High-Speed Wi-Fi', desc: 'Stay connected anywhere' },
-                  { icon: Waves, label: 'Infinity Pool', desc: 'Overlooking the ocean' },
-                  { icon: Spade, label: 'Luxury Spa', desc: 'Rejuvenate your soul' },
-                  { icon: Utensils, label: 'Fine Dining', desc: 'Exquisite local flavors' },
-                ].map((item, i) => (
-                  <div key={i} className="flex flex-col items-center text-center group">
-                    <div className="w-16 h-16 rounded-full bg-hotel-sand flex items-center justify-center mb-6 group-hover:bg-hotel-gold transition-colors duration-500">
-                      <item.icon className="h-8 w-8 text-hotel-blue group-hover:text-white transition-colors duration-500" />
-                    </div>
-                    <h3 className="font-serif font-bold text-xl text-hotel-blue mb-2">{item.label}</h3>
-                    <p className="text-sm text-slate-500 font-light">{item.desc}</p>
-                  </div>
-                ))}
-              </div>
+              <Carousel 
+                opts={{
+                  align: "start",
+                  loop: true,
+                }}
+                plugins={[autoplayPlugin.current]}
+                className="w-full relative px-12"
+              >
+                <CarouselContent>
+                  {[
+                    { icon: Wifi, label: 'High-Speed Wi-Fi', desc: 'Stay connected anywhere', img: 'https://images.unsplash.com/photo-1563911302283-d2bc129e7570?auto=format&fit=crop&q=80&w=800' },
+                    { icon: Waves, label: 'Infinity Pool', desc: 'Overlooking the ocean', img: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&q=80&w=800' },
+                    { icon: Spade, label: 'Luxury Spa', desc: 'Rejuvenate your soul', img: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=800' },
+                    { icon: Utensils, label: 'Fine Dining', desc: 'Exquisite local flavors', img: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&q=80&w=800' },
+                    { icon: Bed, label: 'Premium Bedding', desc: 'Sleep like a baby', img: 'https://images.unsplash.com/photo-1618221118493-9cfa1a1c00da?auto=format&fit=crop&q=80&w=800' },
+                    { icon: Star, label: 'Concierge Services', desc: 'At your beck and call', img: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=800' },
+                  ].map((item, i) => (
+                    <CarouselItem key={i} className="md:basis-1/2 lg:basis-1/4 pl-4 pt-4 pb-12">
+                      <div className="flex flex-col items-center text-center group bg-white shadow-md hover:shadow-2xl transition-all duration-500 rounded-2xl overflow-hidden border border-hotel-blue/5 h-full">
+                        <div className="w-full h-48 overflow-hidden relative">
+                          <img src={item.img} alt={item.label} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                          <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-lg group-hover:bg-hotel-gold transition-colors duration-500 z-10">
+                            <item.icon className="h-8 w-8 text-hotel-blue group-hover:text-white transition-colors duration-500" />
+                          </div>
+                        </div>
+                        <div className="pt-12 pb-8 px-6 flex-1 flex flex-col justify-center">
+                          <h3 className="font-serif font-bold text-xl text-hotel-blue mb-2">{item.label}</h3>
+                          <p className="text-sm text-slate-500 font-light">{item.desc}</p>
+                        </div>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="-left-4 md:-left-8 border-hotel-blue/10 bg-white hover:bg-hotel-sand" />
+                <CarouselNext className="-right-4 md:-right-8 border-hotel-blue/10 bg-white hover:bg-hotel-sand" />
+              </Carousel>
             </div>
           </section>
 
           {/* Featured Rooms */}
           <section className="py-20 bg-hotel-sand px-8 overflow-hidden">
             <div className="max-w-7xl mx-auto">
-              <div className="flex items-end justify-between mb-12">
+              <div className="flex flex-col md:flex-row items-center md:items-end justify-between mb-12 text-center md:text-left gap-6 md:gap-0">
                 <div>
                   <p className="text-hotel-gold font-bold uppercase tracking-[0.3em] text-[10px] mb-2">Exclusive Offers</p>
                   <h2 className="text-4xl font-serif font-bold text-hotel-blue">Featured Rooms</h2>
@@ -962,9 +987,9 @@ const GuestLandingView = ({ activePage, setActivePage, onReturnToAdmin }: { acti
                       <img src={pkg.img} alt={pkg.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                       <Badge className="absolute top-4 right-4 bg-hotel-gold text-hotel-blue font-bold rounded-none border-none">{pkg.tag}</Badge>
                     </div>
-                    <div className="p-8">
+                    <div className="p-8 text-center md:text-left">
                       <h3 className="font-serif font-bold text-2xl text-hotel-blue mb-2">{pkg.title}</h3>
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
                         <p className="text-hotel-gold font-bold text-lg">{pkg.price}</p>
                         <Button variant="link" className="text-hotel-blue p-0 font-bold uppercase text-[10px] tracking-widest">Book Now <ChevronRight className="h-3 w-3 ml-1" /></Button>
                       </div>
@@ -1367,6 +1392,7 @@ export default function App() {
   const [activePage, setActivePage] = useState('welcome');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
   const [isAdminMode, setIsAdminMode] = useState(true);
@@ -1383,10 +1409,21 @@ export default function App() {
     try {
       setAuthLoading(true);
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-    } catch (error) {
+      const result = await signInWithPopup(auth, provider);
+      
+      // Sync Google user with SQL Database
+      await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid: result.user.uid,
+          email: result.user.email,
+          displayName: result.user.displayName || 'Google User'
+        })
+      });
+    } catch (error: any) {
       console.error("Login failed:", error);
-      toast.error("Login failed. Please try again.");
+      toast.error(`Login failed: ${error.message || "Please try again."}`);
     } finally {
       setAuthLoading(false);
     }
@@ -1416,7 +1453,7 @@ export default function App() {
         });
 
         // Save Additional Info to SQL Database
-        await fetch('/api/users', {
+        await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1428,7 +1465,8 @@ export default function App() {
             nationality,
             idType,
             idNumber,
-            role: 'guest'
+            role: 'guest',
+            password
           })
         });
 
@@ -1446,6 +1484,8 @@ export default function App() {
         message = "Email already in use";
       } else if (error.code === 'auth/weak-password') {
         message = "Password should be at least 6 characters";
+      } else {
+        message = `Auth failed: ${error.message}`;
       }
       toast.error(message);
     } finally {
@@ -1495,7 +1535,7 @@ export default function App() {
               <motion.div 
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="max-w-md w-full bg-white/95 backdrop-blur-xl rounded-none shadow-2xl p-12 z-10 border border-white/20"
+                className="max-w-md w-full mx-4 sm:mx-auto bg-white/95 backdrop-blur-xl rounded-none shadow-2xl p-6 md:p-12 z-10 border border-white/20"
               >
                 <div className="flex flex-col items-center text-center mb-12">
                   <div className="bg-hotel-gold p-5 rounded-none shadow-xl mb-8">
@@ -1587,14 +1627,23 @@ export default function App() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase font-bold text-hotel-blue/60 tracking-widest ml-1">Password</label>
-                      <Input 
-                        type="password" 
-                        placeholder="••••••••" 
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="h-12 rounded-none border-hotel-blue/10 focus:border-hotel-gold focus:ring-hotel-gold"
-                        required
-                      />
+                      <div className="relative">
+                        <Input 
+                          type={showPassword ? "text" : "password"} 
+                          placeholder="••••••••" 
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="h-12 rounded-none border-hotel-blue/10 focus:border-hotel-gold focus:ring-hotel-gold pr-10"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-hotel-blue"
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
                     </div>
                     <Button 
                       type="submit"
@@ -1716,7 +1765,7 @@ export default function App() {
       <Toaster position="top-center" richColors />
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} role={role} />
       
-      <main className="lg:ml-64 min-h-screen flex flex-col pb-20 lg:pb-0">
+      <main className="lg:ml-64 min-h-screen flex flex-col pb-20 lg:pb-0 overflow-x-hidden">
         <Header 
           title={activeTab === 'home' ? (isStaff ? 'Dashboard' : 'Welcome') : activeTab} 
           user={{ ...(profile || {}), displayName: user.displayName, role, photoURL: user.photoURL }} 
@@ -1725,7 +1774,7 @@ export default function App() {
           isStaff={isStaff}
         />
         
-        <div className="p-8 flex-1">
+        <div className="p-4 md:p-8 flex-1 overflow-x-hidden">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}

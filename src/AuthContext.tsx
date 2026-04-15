@@ -43,10 +43,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (user) {
       const fetchProfile = async () => {
         try {
-          const response = await fetch(`/api/users`);
-          const users = await response.json();
-          const userProfile = users.find((u: any) => u.uid === user.uid);
-          if (userProfile) {
+          const response = await fetch(`/api/auth/profile/${user.uid}`);
+          if (response.ok) {
+            const userProfile = await response.json();
             setProfile(userProfile);
           }
         } catch (error) {
