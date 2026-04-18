@@ -1,18 +1,23 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { getPool } from '../db/index.js';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'hotel_margarita_super_secret';
 
 router.post('/register', async (req, res) => {
-  const { 
+  let { 
     uid, email, displayName, role, phoneNumber, password, 
     dateOfBirth, nationality, idType, idNumber, 
     employeeId, department, emergencyContact, 
     ipAddress, deviceType, accountStatus, referralSource 
   } = req.body;
+  
+  if (!uid) {
+    uid = crypto.randomUUID();
+  }
   
   try {
     const pool = getPool();
@@ -31,7 +36,13 @@ router.post('/register', async (req, res) => {
       employeeId, department, emergencyContact, 
       ipAddress, deviceType, accountStatus || 'Pending', referralSource, new Date().toISOString()
     ]);
-    res.status(201).json({ message: 'User registered' });
+
+    const token = jwt.sign({ uid, role: role || 'guest' }, JWT_SECRET, { expiresIn: '1d' });
+    res.status(201).json({ 
+      message: 'User registered', 
+      token, 
+      user: { uid, email, displayName, role: role || 'guest' } 
+    });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }

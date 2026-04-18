@@ -4,7 +4,7 @@ const dbConfig = {
   host: 'localhost',
   user: 'root',
   password: '',
-  database: 'hotel_db' // Default connection
+  database: 'magarite_db' // Default connection
 };
 
 let pool: mysql.Pool;

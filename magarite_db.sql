@@ -1,6 +1,6 @@
 -- Create the database
-CREATE DATABASE IF NOT EXISTS hotel_db;
-USE hotel_db;
+CREATE DATABASE IF NOT EXISTS magarite_db;
+USE magarite_db;
 
 -- Users Table
 CREATE TABLE IF NOT EXISTS users (
@@ -179,3 +179,7 @@ INSERT IGNORE INTO rooms (number, type, status, pricePerNight, floor) VALUES
 ('403', 'deluxe', 'available', 300000.00, 4),
 ('404', 'double', 'available', 150000.00, 4),
 ('405', 'suite', 'available', 500000.00, 4);
+
+-- Seed Initial Admin
+INSERT IGNORE INTO users (uid, email, displayName, role, passwordHash, accountStatus, createdAt) VALUES 
+('admin_seeded_12345', 'stuartdonsms@gmail.com', 'Stuart Admin', 'admin', '$2b$10$/kqIJ3hnf2vdQfsEMI0i7emohVSsHLBXartRYc46wUvAQnI5EdHuK', 'Active', '2026-04-17T12:00:00.000Z');
