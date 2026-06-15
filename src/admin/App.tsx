@@ -8,20 +8,28 @@ import { RoomsView } from '@/src/admin/views/RoomsView';
 import { HousekeepingView } from '@/src/admin/views/HousekeepingView';
 import { ReservationsView } from '@/src/admin/views/ReservationsView';
 import { UsersView } from '@/src/admin/views/UsersView';
+import { RoomServiceView } from '@/src/admin/views/RoomServiceView';
+import { AdminChatView } from '@/src/admin/views/AdminChatView';
+import { AdminEventsView } from '@/src/admin/views/AdminEventsView';
+import { AdminFeedbackView } from '@/src/admin/views/AdminFeedbackView';
 import { Clock } from 'lucide-react';
 import { Toaster } from 'sonner';
 
 export default function AdminApp({ user, profile, setIsAdminMode }: any) {
   const [activeTab, setActiveTab] = useState('home');
-  const role = user?.email === 'stuartdonsms@gmail.com' ? 'admin' : (profile?.role || 'staff');
+  const role = user?.email?.toLowerCase() === 'stuartdonsms@gmail.com' ? 'admin' : (profile?.role || 'staff');
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'home': return <AdminDashboardView onSwitchToGuest={() => setIsAdminMode(false)} onSwitchToLanding={() => {}} />;
+      case 'home': return <AdminDashboardView role={role} onSwitchToGuest={() => setIsAdminMode(false)} onSwitchToLanding={() => {}} />;
       case 'rooms': return <RoomsView />;
       case 'housekeeping': return <HousekeepingView />;
       case 'reservations': return <ReservationsView role={role} />;
       case 'users': return <UsersView />;
+      case 'room-service': return <RoomServiceView role={role} />;
+      case 'messages': return <AdminChatView />;
+      case 'events': return <AdminEventsView />;
+      case 'feedback': return <AdminFeedbackView />;
       default: return (
         <div className="flex flex-col items-center justify-center h-[60vh] text-slate-300">
           <Clock className="h-20 w-20 mb-6 opacity-10" />

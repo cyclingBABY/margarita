@@ -1,10 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { UserProfile } from './types';
+import { auth } from './firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 // We drop Firebase User dependency for email login
 interface AuthContextType {
   user: any | null; 
   profile: UserProfile | null;
+  setProfile: React.Dispatch<React.SetStateAction<UserProfile | null>>;
   loading: boolean;
   isAuthReady: boolean;
   setSession: (token: string, userData: any) => void;
@@ -14,6 +17,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   profile: null,
+  setProfile: () => {},
   loading: true,
   isAuthReady: false,
   setSession: () => {},
@@ -55,11 +59,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsAuthReady(true);
   }, []);
 
+  // Listen to Firebase auth state changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        // User is signed in to Firebase
+        // The user state should already be set from localStorage or setSession
+        // This ensures sync between Firebase and our custom auth
+      } else {
+        // User is signed out from Firebase
+        // Clear our local session only if they were logged in with Google/Firebase
+        const authMethod = localStorage.getItem('authMethod');
+        if (authMethod === 'google') {
+          clearSession();
+          localStorage.removeItem('authMethod');
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   useEffect(() => {
     if (user?.uid) {
       const fetchProfile = async () => {
         try {
-          const response = await fetch(`http://localhost/margarita/api/profile.php?uid=${user.uid}`);
+          const response = await fetch(`/api/auth/profile/${user.uid}`);
           if (response.ok) {
             const userProfile = await response.json();
             setProfile(userProfile);
@@ -84,7 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user?.uid]);
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, isAuthReady, setSession, clearSession }}>
+    <AuthContext.Provider value={{ user, profile, setProfile, loading, isAuthReady, setSession, clearSession }}>
       {children}
     </AuthContext.Provider>
   );

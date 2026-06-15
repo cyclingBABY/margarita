@@ -3,7 +3,7 @@ import { authenticateToken, authorizeRoles, AuthRequest } from '../middleware/au
 import { getPool } from '../db/index.js';
 
 const router = Router();
-router.use(authenticateToken, authorizeRoles('admin', 'receptionist', 'manager', 'housekeeping'));
+router.use(authenticateToken, authorizeRoles('admin', 'staff', 'housekeeping'));
 
 // Existing: Get all rooms (Managers & Housekeeping need this)
 router.get('/rooms', async (req, res) => {

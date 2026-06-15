@@ -18,3 +18,17 @@ View your app in AI Studio: https://ai.studio/apps/7db8d865-0ae8-4592-857b-b1a5f
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
 3. Run the app:
    `npm run dev`
+
+## Admin Credentials
+
+For development and local testing purposes, the following administrator credentials are configured in the local database:
+
+| Name | Email | Password | Role |
+| :--- | :--- | :--- | :--- |
+| **Stuart Admin** | `stuartdonsms@gmail.com` | `admin123` | Admin (Main) |
+| **Test Admin** | `testadmin@example.com` | `admin123` | Admin |
+| **Test Admin 2** | `testadmin2@example.com` | `testadmin2` | Admin |
+
+> [!NOTE]
+> The passwords for `stuartdonsms@gmail.com` and `testadmin@example.com` have been updated to `admin123` for ease of local access.
+

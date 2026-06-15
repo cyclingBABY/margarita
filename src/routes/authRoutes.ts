@@ -37,7 +37,7 @@ router.post('/register', async (req, res) => {
       ipAddress, deviceType, accountStatus || 'Pending', referralSource, new Date().toISOString()
     ]);
 
-    const token = jwt.sign({ uid, role: role || 'guest' }, JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ uid, role: role || 'guest' }, JWT_SECRET, { expiresIn: '7d' });
     res.status(201).json({ 
       message: 'User registered', 
       token, 
@@ -70,7 +70,7 @@ router.post('/login', async (req, res) => {
             return;
         }
 
-        const token = jwt.sign({ uid: user.uid, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
+        const token = jwt.sign({ uid: user.uid, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
         res.json({ token, user: { uid: user.uid, role: user.role, displayName: user.displayName, email: user.email }});
     } catch (err: any) {
         res.status(500).json({ error: err.message });
@@ -82,13 +82,20 @@ router.post('/google', async (req, res) => {
   try {
     const pool = getPool();
     const [existing]: any = await pool.query('SELECT * FROM users WHERE uid = ?', [uid]);
+    let role = 'guest';
     if (existing.length === 0) {
       await pool.query(`
         INSERT INTO users (uid, email, displayName, role, accountStatus, createdAt)
         VALUES (?, ?, ?, 'guest', 'Active', ?)
       `, [uid, email, displayName, new Date().toISOString()]);
+    } else {
+      role = existing[0].role;
     }
-    res.json({ message: 'Google user synced' });
+    const token = jwt.sign({ uid, role }, JWT_SECRET, { expiresIn: '7d' });
+    res.json({
+      token,
+      user: { uid, email, displayName, role }
+    });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

@@ -11,6 +11,10 @@ export interface UserProfile {
   displayName: string;
   role: UserRole;
   photoURL?: string;
+  profilePicture?: string;
+  phoneNumber?: string;
+  dateOfBirth?: string;
+  nationality?: string;
   createdAt: string;
 }
 
@@ -41,7 +45,7 @@ export interface Reservation {
   totalAmount: number;
   status: ReservationStatus;
   createdAt: string;
-  paymentStatus: 'pending' | 'paid' | 'failed';
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
 }
 
 export interface Message {

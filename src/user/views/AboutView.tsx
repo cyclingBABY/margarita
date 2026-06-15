@@ -104,7 +104,11 @@ import { AdminDashboardView } from '@/src/admin/views/AdminDashboardView';
 import { GuestDashboardView } from '@/src/user/views/GuestDashboardView';
 import { RoomsView } from '@/src/admin/views/RoomsView';
 
-export const AboutView = () => (
+interface AboutViewProps {
+  navigateToContact: () => void;
+}
+
+export const AboutView = ({ navigateToContact }: AboutViewProps) => (
   <div className="pt-24 bg-hotel-sand min-h-screen">
     <section className="py-20 px-8 max-w-7xl mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -152,12 +156,20 @@ export const AboutView = () => (
           <div className="p-10 bg-white/5 border border-white/10">
             <h3 className="text-2xl font-serif font-bold mb-4 text-hotel-sand">Corporate Excellence</h3>
             <p className="text-sm text-white/60 mb-6">Our conference halls are equipped with the latest technology to ensure your business events are seamless and professional.</p>
-            <Button variant="outline" className="border-hotel-gold text-hotel-gold hover:bg-hotel-gold hover:text-hotel-blue rounded-none uppercase text-[10px] tracking-widest font-bold">Inquire Now</Button>
+            <Button
+              variant="outline"
+              onClick={navigateToContact}
+              className="border-hotel-gold text-hotel-gold hover:bg-hotel-gold hover:text-hotel-blue rounded-none uppercase text-[10px] tracking-widest font-bold"
+            >Inquire Now</Button>
           </div>
           <div className="p-10 bg-white/5 border border-white/10">
             <h3 className="text-2xl font-serif font-bold mb-4 text-hotel-sand">Dream Weddings</h3>
             <p className="text-sm text-white/60 mb-6">From beachfront ceremonies to grand ballroom receptions, we make your special day truly unforgettable.</p>
-            <Button variant="outline" className="border-hotel-gold text-hotel-gold hover:bg-hotel-gold hover:text-hotel-blue rounded-none uppercase text-[10px] tracking-widest font-bold">Plan Your Wedding</Button>
+            <Button
+              variant="outline"
+              onClick={navigateToContact}
+              className="border-hotel-gold text-hotel-gold hover:bg-hotel-gold hover:text-hotel-blue rounded-none uppercase text-[10px] tracking-widest font-bold"
+            >Plan Your Wedding</Button>
           </div>
         </div>
       </div>

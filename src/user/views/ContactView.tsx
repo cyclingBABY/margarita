@@ -120,7 +120,7 @@ export const ContactView = () => (
               </div>
               <div>
                 <h4 className="font-bold text-hotel-blue uppercase text-[10px] tracking-widest mb-1">Reception</h4>
-                <p className="text-slate-600">+1 (555) 123-4567</p>
+                <p className="text-slate-600">+256 414 123456</p>
               </div>
             </div>
             <div className="flex gap-6">
@@ -129,7 +129,7 @@ export const ContactView = () => (
               </div>
               <div>
                 <h4 className="font-bold text-hotel-blue uppercase text-[10px] tracking-widest mb-1">Reservations</h4>
-                <p className="text-slate-600">reservations@margaritahotel.com</p>
+                <p className="text-slate-600">reservations.uganda@margaritahotel.com</p>
               </div>
             </div>
             <div className="flex gap-6">
@@ -138,7 +138,7 @@ export const ContactView = () => (
               </div>
               <div>
                 <h4 className="font-bold text-hotel-blue uppercase text-[10px] tracking-widest mb-1">Location</h4>
-                <p className="text-slate-600">123 Tropical Way, Paradise Island</p>
+                <p className="text-slate-600">Kampala, Uganda</p>
               </div>
             </div>
           </div>
@@ -170,11 +170,16 @@ export const ContactView = () => (
         </div>
       </div>
 
-      <div className="mt-20 h-[400px] bg-slate-200 relative overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center text-slate-400 font-bold uppercase tracking-widest">
-          Google Maps Integration Placeholder
-        </div>
-        <img src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&q=80&w=1200" className="w-full h-full object-cover opacity-20" alt="Map" />
+      <div className="mt-20 h-[400px] shadow-2xl overflow-hidden rounded-xl">
+        <iframe
+          title="Margarita Hotel Uganda Location"
+          className="w-full h-full"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.4340874857054!2d32.524620174273335!3d0.3475966992206235!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x177db71383676f8f%3A0x2c0d0d1f2c6fae2c!2sKampala%2C%20Uganda!5e0!3m2!1sen!2sus!4v1700000000000"
+          style={{ border: 0 }}
+          allowFullScreen={false}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        />
       </div>
     </section>
   </div>

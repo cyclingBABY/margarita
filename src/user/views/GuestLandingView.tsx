@@ -174,7 +174,7 @@ export const GuestLandingView = ({ activePage, setActivePage, onReturnToAdmin }:
                     </select>
                   </div>
                 </div>
-                <Button className="bg-hotel-blue hover:bg-hotel-blue/90 text-white px-10 h-16 rounded-none font-bold uppercase tracking-widest text-xs w-full md:w-auto">
+                <Button onClick={() => setActivePage('home')} className="bg-hotel-blue hover:bg-hotel-blue/90 text-white px-10 h-16 rounded-none font-bold uppercase tracking-widest text-xs w-full md:w-auto">
                   Check Availability
                 </Button>
               </motion.div>
@@ -262,7 +262,7 @@ export const GuestLandingView = ({ activePage, setActivePage, onReturnToAdmin }:
                       <h3 className="font-serif font-bold text-2xl text-hotel-blue mb-2">{pkg.title}</h3>
                       <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
                         <p className="text-hotel-gold font-bold text-lg">{pkg.price}</p>
-                        <Button variant="link" className="text-hotel-blue p-0 font-bold uppercase text-[10px] tracking-widest">Book Now <ChevronRight className="h-3 w-3 ml-1" /></Button>
+                        <Button onClick={() => setActivePage('home')} variant="link" className="text-hotel-blue p-0 font-bold uppercase text-[10px] tracking-widest">Book Now <ChevronRight className="h-3 w-3 ml-1" /></Button>
                       </div>
                     </div>
                   </motion.div>
@@ -305,7 +305,7 @@ export const GuestLandingView = ({ activePage, setActivePage, onReturnToAdmin }:
           </div>
         </div>
       );
-      case 'about': return <AboutView />;
+      case 'about': return <AboutView navigateToContact={() => setActivePage('contact')} />;
       case 'gallery': return <GalleryView />;
       case 'blog': return <BlogView />;
       case 'contact': return <ContactView />;

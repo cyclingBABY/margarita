@@ -5,6 +5,11 @@ import { Header } from '@/src/components/layout/Header';
 import { BottomNav } from '@/src/components/layout/BottomNav';
 import { GuestDashboardView } from '@/src/user/views/GuestDashboardView';
 import { GuestLandingView } from '@/src/user/views/GuestLandingView';
+import { ChatView } from '@/src/user/views/ChatView';
+import { FeedbackView } from '@/src/user/views/FeedbackView';
+import { EventsView } from '@/src/user/views/EventsView';
+import { ReservationsView } from '@/src/admin/views/ReservationsView';
+import { SettingsView } from '@/src/admin/views/SettingsView';
 import { Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Toaster } from 'sonner';
@@ -28,8 +33,24 @@ export default function UserApp({ user, profile, isStaff, setIsAdminMode }: any)
       );
     }
     
-    if (activeTab === 'welcome') {
-        return <GuestLandingView activePage="welcome" setActivePage={() => {}} onReturnToAdmin={isStaff ? () => { setIsAdminMode(true); setActiveTab('home'); } : undefined} />;
+    if (activeTab === 'reservations') {
+      return <ReservationsView role={role} onNewBooking={() => setActiveTab('home')} />;
+    }
+
+    if (activeTab === 'messages') {
+      return <ChatView user={profile || user} />;
+    }
+
+    if (activeTab === 'feedback') {
+      return <FeedbackView user={profile || user} />;
+    }
+
+    if (activeTab === 'events') {
+      return <EventsView />;
+    }
+
+    if (activeTab === 'settings') {
+      return <SettingsView role={role} />;
     }
     
     return (

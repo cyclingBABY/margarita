@@ -105,16 +105,17 @@ import { GuestDashboardView } from '@/src/user/views/GuestDashboardView';
 import { RoomsView } from '@/src/admin/views/RoomsView';
 
 export const Sidebar = ({ activeTab, setActiveTab, role }: { activeTab: string, setActiveTab: (t: string) => void, role: string }) => {
+  const { clearSession } = useAuth();
   const isStaff = ['admin', 'staff', 'housekeeping'].includes(role);
   
   const menuItems = [
     { id: 'home', label: isStaff ? 'Admin Dashboard' : 'User Dashboard', icon: Hotel, roles: ['admin', 'staff', 'housekeeping', 'guest'] },
-    { id: 'welcome', label: 'Welcome Page', icon: Star, roles: ['guest'] },
     { id: 'users', label: 'User Management', icon: Users, roles: ['admin'] },
     { id: 'rooms', label: 'Room Inventory', icon: Bed, roles: ['admin', 'staff'] },
     { id: 'reservations', label: 'Reservations', icon: CalendarIcon, roles: ['admin', 'staff', 'guest'] },
+    { id: 'room-service', label: 'Room Service', icon: Utensils, roles: ['admin', 'staff'] },
     { id: 'housekeeping', label: 'Housekeeping', icon: Bed, roles: ['admin', 'staff', 'housekeeping'] },
-    { id: 'events', label: 'Events', icon: Utensils, roles: ['admin', 'staff'] },
+    { id: 'events', label: 'Events', icon: CalendarIcon, roles: ['admin', 'staff', 'guest'] },
     { id: 'messages', label: 'Messages', icon: MessageSquare, roles: ['admin', 'staff', 'guest'] },
     { id: 'feedback', label: 'Feedback', icon: Star, roles: ['admin', 'staff', 'guest'] },
     { id: 'settings', label: 'Settings', icon: Settings, roles: ['admin', 'staff', 'guest'] },
@@ -150,7 +151,11 @@ export const Sidebar = ({ activeTab, setActiveTab, role }: { activeTab: string, 
 
       <div className="p-6 border-t border-white/10">
         <button 
-          onClick={() => signOut(auth)}
+          onClick={() => {
+            signOut(auth);
+            clearSession();
+            localStorage.removeItem('authMethod');
+          }}
           className="w-full flex items-center gap-4 px-5 py-4 text-white/60 hover:text-white transition-colors"
         >
           <LogOut className="h-5 w-5" />

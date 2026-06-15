@@ -22,11 +22,26 @@ async function startServer() {
   app.use(cors());
   app.use(express.json());
 
+  // Serve uploaded files
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
   try {
     // 1. Initialize DB Pool
     const pool = getPool();
-    // In a real application, database creation logic and schema would be handled 
-    // externally via migrations or an initialization script rather than on server boot.
+    // Run lightweight migrations
+    try {
+      await pool.query('ALTER TABLE feedback ADD COLUMN IF NOT EXISTS serviceType VARCHAR(50)');
+      await pool.query('ALTER TABLE feedback ADD COLUMN IF NOT EXISTS serviceId VARCHAR(255)');
+      await pool.query('ALTER TABLE room_service_orders ADD COLUMN IF NOT EXISTS paymentStatus VARCHAR(50) DEFAULT "pending"');
+      await pool.query('ALTER TABLE spa_bookings ADD COLUMN IF NOT EXISTS paymentStatus VARCHAR(50) DEFAULT "pending"');
+      await pool.query('ALTER TABLE reservations ADD COLUMN IF NOT EXISTS approvedBy VARCHAR(255)');
+      await pool.query('ALTER TABLE reservations ADD COLUMN IF NOT EXISTS approvedAt VARCHAR(100)');
+      await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS profilePicture VARCHAR(500)');
+      console.log("Database migrations applied.");
+    } catch (migrationErr: any) {
+      // Columns may already exist; ignore errors
+      console.log("Migration check complete (columns may already exist).");
+    }
     console.log("Database pool initialized.");
   } catch (err: any) {
     console.warn("Could not connect to MySQL database:", err.message);
